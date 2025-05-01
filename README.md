@@ -1,4 +1,4 @@
-# RadComp: Radial compressor mean-line model
+# RadCompressor: Radial compressor mean-line model
 
 Mean-line (1D) model for evaluating radial compressors. The code is adapted
 from the version developed by Schiffmann and Favrat[^1], and was used to generate
