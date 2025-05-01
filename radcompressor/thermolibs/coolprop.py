@@ -1,4 +1,5 @@
 """Set of functions and classes to use CoolProp as backend"""
+
 __all__ = ["CoolPropFluid"]
 
 from dataclasses import dataclass

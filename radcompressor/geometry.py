@@ -61,9 +61,7 @@ class Geometry:
     def A_y(self):
         # Effective area at station 3
         return (
-            (self.r2s**2 - self.r2h**2)
-            * math.pi
-            * math.cos(self.beta2 / 180 * math.pi)
+            (self.r2s**2 - self.r2h**2) * math.pi * math.cos(self.beta2 / 180 * math.pi)
             - (self.r2s - self.r2h) * self.blade_e * self.n_blades
         ) * self.blockage[2]
 
