@@ -61,7 +61,7 @@ class Inducer:
         in_total = self.in1.total
 
         def resolve_c1(x):
-            c1 = x
+            c1 = x[0]
             try:
                 Stat1 = static_from_total(in_total, c1)
                 err1 = (op.m - geom.A1_eff * c1 * Stat1.D) / op.m

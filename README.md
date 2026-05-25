@@ -37,6 +37,56 @@ pip install .[generate]
 
 A step-by-step example is provided in the [EvaluateCompressor.ipynb notebook](notebooks/EvaluateCompressor.ipynb).
 
+## Compressor design (inverse problem)
+
+The base model is a *forward* analysis (geometry + operating point ->
+performance). The `radcompressor.design` and `radcompressor.multistage`
+modules add the *inverse* problem: given a duty they synthesise a consistent
+mean-line geometry, size the tip speed to hit the target pressure ratio and
+tune the shape coefficients for efficiency. Multi-stage trains propagate the
+inter-stage state and support optional intercooling.
+
+### Command line
+
+A `radcomp` console script (also `python -m radcompressor.cli`) exposes three
+sub-commands:
+
+```bash
+radcomp design duty.json -o result.json        # design from a JSON duty
+radcomp analyze geometry.json --fluid CO2 --p-in 7.6e6 --t-in 310 --m 15.8 --rpm 27400
+radcomp map     geometry.json --fluid CO2 --p-in 7.6e6 --t-in 310 -o map.json
+```
+
+### Python API
+
+```python
+from radcompressor.io_json import load_duty, save_design
+from radcompressor.multistage import design_compressor
+
+design = design_compressor(load_duty("duty.json"))
+save_design(design, "result.json")
+print(design.pr_total, design.eff_total, design.power_total)
+```
+
+A duty JSON uses SI base units (Pa, kg/s, rpm); temperature may be given in
+degrees Celsius with `"t_in_unit": "C"`:
+
+```json
+{
+  "name": "co2_stage", "fluid": "CO2",
+  "m": 15.8, "speed_rpm": 27400,
+  "p_in": 7600000.0, "t_in": 37.0, "t_in_unit": "C",
+  "pr_target": 1.5, "n_stages": 1, "intercooling": false
+}
+```
+
+The seven benchmark duties in `examples/duties/` are designed end-to-end by
+`python examples/run_design_suite.py`.
+
+> **Note on dependencies:** CoolProp requires native Python floats; the
+> thermodynamic backend casts NumPy scalars and size-1 solver arrays, so the
+> model runs under both NumPy 1.x and NumPy >= 2.
+
 
 ## Citation
 

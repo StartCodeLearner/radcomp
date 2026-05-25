@@ -2,10 +2,12 @@
 
 __all__ = ["CoolPropFluid"]
 
+import math
 from dataclasses import dataclass
 from typing import Union
 
 import CoolProp as CP
+import numpy as np
 
 from .base import Fluid, ThermoException, ThermoProp
 
@@ -64,6 +66,15 @@ class CoolPropFluid(Fluid):
     def thermo_prop(
         self, in_type: Union[str, int], in1: float, in2: float
     ) -> "ThermoProp":
+        # Cast to native floats. CoolProp's Cython interface rejects NumPy
+        # scalars and size-1 arrays (raising an opaque TypeError under
+        # NumPy >= 2); the mean-line solvers routinely feed it such values
+        # from ``scipy.optimize.root`` callbacks.
+        in1 = float(np.asarray(in1).item())
+        in2 = float(np.asarray(in2).item())
+        if not (math.isfinite(in1) and math.isfinite(in2)):
+            raise ThermoException("Non-finite thermo input", in_type, in1, in2)
+
         if isinstance(in_type, str):
             inputs = cp_inputs[in_type]
             input_pair = CP.CoolProp.generate_update_pair(
@@ -74,7 +85,10 @@ class CoolPropFluid(Fluid):
 
         try:
             self.state.update(*input_pair)
-        except ValueError as e:
+        except Exception as e:
+            # CoolProp may raise ValueError or other backend errors for
+            # out-of-range / non-physical states; surface them all as the
+            # domain exception the mean-line model already handles.
             raise ThermoException(*e.args, *input_pair)
 
         if self.state.phase() not in cp_phases.keys():

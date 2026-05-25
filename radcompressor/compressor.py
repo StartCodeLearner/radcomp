@@ -5,6 +5,7 @@ from .diffuser import VanelessDiffuser, surge_critical_angle
 from .geometry import Geometry
 from .impeller import Impeller
 from .inducer import Inducer
+from .thermo import ThermoException
 
 
 class Compressor:
@@ -73,7 +74,11 @@ class Compressor:
             self.invalid_flag = True
             return False
 
-        tp_is = self.op.fld.thermo_prop("PS", self.out.total.P, self.in_.total.S)
+        try:
+            tp_is = self.op.fld.thermo_prop("PS", self.out.total.P, self.in_.total.S)
+        except ThermoException:
+            self.invalid_flag = True
+            return False
         self.dh0s = tp_is.H - self.in_.total.H
         self.head = self.dh0s / (self.tip_speed**2)
 

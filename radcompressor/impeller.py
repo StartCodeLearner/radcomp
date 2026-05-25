@@ -52,7 +52,12 @@ class Impeller:
     ) -> None:
         self.in2 = ImpellerState.from_state(ind.out)
         if self.out.is_not_set:
-            self.calculate(geom, op)
+            try:
+                self.calculate(geom, op)
+            except ThermoException:
+                # An unrecoverable thermodynamic state at an off-design point
+                # is treated as a choked/invalid impeller rather than crashing.
+                self.choke_flag = True
 
     def skin_friction_losses(self, geom: Geometry, w4: float, tp4: ThermoProp) -> float:
         """Calculates the impeller skin friction losses according to Jansen, Coppage Galvas"""
@@ -188,7 +193,7 @@ class Impeller:
         # Resolve static 3
         def resolve_static(x):
             try:
-                stat3 = static_from_total(self.in2.relative, x)
+                stat3 = static_from_total(self.in2.relative, x[0])
             except ThermoException:
                 return 1e4
 
@@ -327,11 +332,7 @@ class Impeller:
         c4 = (c4t**2 + c4m**2) ** 0.5
         self.out.c = c4
         alpha = atan(c4t / c4m) * 180 / pi
-        try:
-            self.out.total = total_from_static(self.out.static, c4)
-        except:
-            print(c4, w4)
-            raise
+        self.out.total = total_from_static(self.out.static, c4)
         self.out.isentropic = op.fld.thermo_prop(
             "PS", self.out.total.P, self.in2.static.S
         )

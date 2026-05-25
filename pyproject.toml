@@ -29,6 +29,9 @@ generate = [
 ]
 test = ["pytest >= 6.0.0"]
 
+[project.scripts]
+radcomp = "radcompressor.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/cyrilpic/radcomp"
 Repository = "https://github.com/cyrilpic/radcomp.git"
