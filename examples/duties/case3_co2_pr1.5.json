@@ -1,0 +1,12 @@
+{
+  "name": "case3_co2",
+  "fluid": "CO2",
+  "m": 15.8,
+  "speed_rpm": 27400,
+  "p_in": 7600000.0,
+  "t_in": 37.0,
+  "t_in_unit": "C",
+  "pr_target": 1.5,
+  "n_stages": 1,
+  "intercooling": false
+}

@@ -1,0 +1,12 @@
+{
+  "name": "case7_water",
+  "fluid": "water",
+  "m": 2.8,
+  "speed_rpm": 34500,
+  "p_in": 100000.0,
+  "t_in": 100.0,
+  "t_in_unit": "C",
+  "pr_target": 10.0,
+  "n_stages": 4,
+  "intercooling": false
+}

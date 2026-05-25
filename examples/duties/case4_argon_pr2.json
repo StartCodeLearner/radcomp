@@ -1,0 +1,12 @@
+{
+  "name": "case4_argon",
+  "fluid": "argon",
+  "m": 17.0,
+  "speed_rpm": 12000,
+  "p_in": 1500000.0,
+  "t_in": 320.0,
+  "t_in_unit": "C",
+  "pr_target": 2.0,
+  "n_stages": 4,
+  "intercooling": false
+}
