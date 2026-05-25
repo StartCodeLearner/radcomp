@@ -5,8 +5,9 @@ description: >-
   the user wants to size a compressor to a target pressure ratio, run a
   multi-stage train (with optional intercooling), evaluate a geometry, or
   generate a performance map. Handles a JSON duty in / design JSON out workflow
-  and the `radcomp` CLI. The rotordynamics handoff to ROSS (rotor build +
-  DyRoBeS export) is the planned next stage of this harness.
+  and the `radcomp` CLI. The design JSON also feeds the rotordynamics handoff to
+  ROSS (rotor build, critical speeds / stability, DyRoBeS export) via the
+  `compressor_rotor` package in the ross repository.
 ---
 
 # Centrifugal compressor design harness
@@ -85,6 +86,24 @@ radcomp map geometry.json --fluid CO2 --p-in 7.6e6 --t-in 310 -o map.json
 
 `analyze` and `map` accept either a bare geometry JSON or a full design-result
 JSON (they read its `geometry` block).
+
+## Rotordynamics handoff (ROSS + DyRoBeS)
+
+The design `result.json` is the bridge contract to the rotor stage, implemented
+in the **ross** repository under `compressor_rotor/`. From the ross repo root:
+
+```bash
+python -m compressor_rotor analyze result.json -o rotor_analysis.json
+python -m compressor_rotor dyrobes result.json -o rotor.dyr
+python -m compressor_rotor build   result.json --outdir rotor_out/   # both + rotor.toml
+```
+
+It lays out a between-bearing rotor (shaft sized to the impeller eye, impellers
+as disks via a fill factor, size-consistent journal bearings -- all overridable
+with a structural-config JSON via `-s`), runs damped critical speeds, modal
+log-decrement stability and a synchronous unbalance sweep, and writes a DyRoBeS
+ASCII model. Bearing coefficients default to a size estimate -- replace them
+with real data for a final analysis.
 
 ## End-to-end suite
 
