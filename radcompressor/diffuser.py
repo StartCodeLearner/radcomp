@@ -34,7 +34,10 @@ class VanelessDiffuser:
         self, geom: Geometry, op: OperatingCondition, imp: Impeller
     ) -> None:
         self.in4 = VanelessState.from_state(imp.out)
-        self.calculate(geom, op)
+        try:
+            self.calculate(geom, op)
+        except ThermoException:
+            self.choke_flag = True
 
     def calculate(self, geom: Geometry, op: OperatingCondition):
         r = np.linspace(geom.r4, geom.r5, 1 + self.n_steps, endpoint=True)
